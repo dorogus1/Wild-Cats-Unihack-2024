@@ -23,6 +23,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
             <input type="password" placeholder="Password" />
             <br />
             <button onClick={handleLogin}>Login</button>
+
         </div>
     );
 };

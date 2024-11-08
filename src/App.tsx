@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./LoginPage";
 import HomePage from "./HomePage";
-
+import SignUpPage from "./SignUpPage";
 const App: React.FC = () => {
   // Inițializează starea isLoggedIn folosind valoarea din localStorage
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
