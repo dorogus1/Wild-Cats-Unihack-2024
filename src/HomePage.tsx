@@ -11,8 +11,8 @@ const HomePage: React.FC = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem("isLoggedIn"); // Șterge autentificarea din localStorage
-        navigate("/login"); // Redirecționează către pagina de login
+        localStorage.removeItem("isLoggedIn");
+        navigate("/login");
     };
 
     const mapContainerStyle = { width: '100%', height: '1000px', border: '1px solid black' };
