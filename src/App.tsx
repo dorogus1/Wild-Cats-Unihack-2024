@@ -20,7 +20,8 @@ const App: React.FC = () => {
                 <Route path="/login" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
 
                 {/* Pagina de signup */}
-                <Route path="/SignUpPage" element={<SignUpPage setIsSignedUp={setIsSignedUp} />} />
+                <Route path="/signup" element={<SignUpPage setIsSignedUp={setIsSignedUp} />} />
+
 
                 {/* Pagina Home protejată */}
                 <Route

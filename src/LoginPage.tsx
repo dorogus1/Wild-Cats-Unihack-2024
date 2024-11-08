@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface LoginPageProps {
@@ -6,27 +6,51 @@ interface LoginPageProps {
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
     const navigate = useNavigate();
 
     const handleLogin = () => {
         // Aici poți implementa validarea credentialelor (username/parola)
-        localStorage.setItem("isLoggedIn", "true"); // Salvează autentificarea în localStorage
-        setIsLoggedIn(true); // Actualizează starea de autentificare
-        navigate("/home"); // Navighează la pagina Home
+        const users = JSON.parse(localStorage.getItem("users") || "[]");
+        const user = users.find((user: any) => user.username === username && user.password === password);
+
+        if (user) {
+            localStorage.setItem("isLoggedIn", "true"); // Salvează autentificarea în localStorage
+            setIsLoggedIn(true); // Actualizează starea de autentificare
+            navigate("/home"); // Navighează la pagina Home
+        } else {
+            alert("Invalid username or password");
+        }
     };
 
-    const handleSignedUp = () => {
-        navigate("/SignedUp"); // Navighează la pagina Home
+    const handleSignUp = () => {
+        navigate("/signup"); // Navighează la pagina de înregistrare
     };
+
     return (
-        <div style={{textAlign: "center", marginTop: "50px"}}>
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
             <h1>Login</h1>
-            <input type="text" placeholder="Username"/>
-            <br/>
-            <input type="password" placeholder="Password"/>
-            <br/>
+            <div>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+            </div>
+            <div>
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+            </div>
+            <br />
             <button onClick={handleLogin}>Login</button>
-            <button onClick={handleSignedUp}>Sign Up</button>
+            <br />
+            <button onClick={handleSignUp}>Sign Up</button>
         </div>
     );
 };
