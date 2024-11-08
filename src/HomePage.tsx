@@ -4,8 +4,8 @@ import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
-import OSM from 'ol/source/OSM';
 import { useEffect } from "react";
+import { fromLonLat } from 'ol/proj';
 
 const HomePage: React.FC = () => {
     const navigate = useNavigate();
@@ -18,18 +18,21 @@ const HomePage: React.FC = () => {
     const mapContainerStyle = { width: '100%', height: '1000px', border: '1px solid black' };
 
     useEffect(() => {
-        const osmSource = new OSM();
+        const xyzSource = new XYZ({
+            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        });
+        const timisoaraCoordinates = fromLonLat([21.2087, 45.7489]);
 
         new Map({
             target: 'map',
             layers: [
                 new TileLayer({
-                    source: osmSource,
+                    source: xyzSource,
                 }),
             ],
             view: new View({
-                center: [0, 0],
-                zoom: 2,
+                center: timisoaraCoordinates,
+                zoom: 13,
             }),
         });
     }, []);
