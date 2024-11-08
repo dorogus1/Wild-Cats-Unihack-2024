@@ -15,15 +15,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
         navigate("/home"); // Navighează la pagina Home
     };
 
+    const handleSignedUp = () => {
+        navigate("/SignedUp"); // Navighează la pagina Home
+    };
     return (
-        <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <div style={{textAlign: "center", marginTop: "50px"}}>
             <h1>Login</h1>
-            <input type="text" placeholder="Username" />
-            <br />
-            <input type="password" placeholder="Password" />
-            <br />
+            <input type="text" placeholder="Username"/>
+            <br/>
+            <input type="password" placeholder="Password"/>
+            <br/>
             <button onClick={handleLogin}>Login</button>
-
+            <button onClick={handleSignedUp}>Sign Up</button>
         </div>
     );
 };

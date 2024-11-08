@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const SignUpPage: React.FC = () => {
+// Definim tipul props pentru componentă
+interface SignUpPageProps {
+    setIsSignedUp: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const SignUpPage: React.FC<SignUpPageProps> = ({ setIsSignedUp }) => {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -9,12 +14,13 @@ const SignUpPage: React.FC = () => {
     const navigate = useNavigate();
 
     const handleSignUp = () => {
+        // Verificăm dacă parolele coincid
         if (password !== confirmPassword) {
             setErrorMessage("Passwords do not match!");
             return;
         }
 
-        // Save user credentials (in a real app, send this data to a backend server)
+        // Obținem lista de utilizatori din localStorage
         const users = JSON.parse(localStorage.getItem("users") || "[]");
         const userExists = users.some((user: any) => user.username === username);
 
@@ -23,10 +29,14 @@ const SignUpPage: React.FC = () => {
             return;
         }
 
+        // Adăugăm utilizatorul nou în localStorage
         users.push({ username, password });
         localStorage.setItem("users", JSON.stringify(users));
 
-        // Redirect to login page after successful signup
+        // Setăm `isSignedUp` la `true`
+        setIsSignedUp(true);
+
+        // Navigăm către pagina de login
         navigate("/login");
     };
 
