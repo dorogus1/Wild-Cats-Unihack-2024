@@ -1,26 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./LoginPage";
+import HomePage from "./HomePage";
 
-function App() {
+const App: React.FC = () => {
+  // Inițializează starea isLoggedIn folosind valoarea din localStorage
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem("isLoggedIn") === "true"; // Verifică dacă utilizatorul este logat
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <Router>
+        <Routes>
+          {/* LoginPage */}
+          <Route path="/login" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+          {/* Protected HomePage */}
+          <Route
+              path="/home"
+              element={isLoggedIn ? <HomePage /> : <Navigate to="/login" replace />}
+          />
+          {/* Redirect către login dacă userul accesează ruta rădăcină */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
   );
-}
+};
 
 export default App;
