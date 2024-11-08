@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 interface LoginPageProps {
-    setIsLoggedIn: (value: boolean) => void;
+    setIsLoggedIn: (value: true) => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
