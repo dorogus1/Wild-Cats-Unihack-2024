@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
 
             const view = map.getView();
             view.setCenter(coordinate);
-            view.setZoom(14);
+            view.setZoom(16);
         });
     }, []);
 
