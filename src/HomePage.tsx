@@ -1,10 +1,10 @@
-import React, {useRef} from "react";
+import React, { useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
-import { useEffect } from "react";
 import { fromLonLat } from 'ol/proj';
 import "ol/ol.css"
 import "ol-ext/dist/ol-ext.css"
@@ -20,6 +20,10 @@ import VectorLayer from "ol/layer/Vector";
 const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const mapRef = useRef<Map | null>(null);
+    const vectorSourceRef = useRef<VectorSource | null>(null);
+
+
+    const [lastTwoLocations, setLastTwoLocations] = useState<[number[], number[]]>([[], []]);
 
     const handleLogout = () => {
         localStorage.removeItem("isLoggedIn");
@@ -35,6 +39,7 @@ const HomePage: React.FC = () => {
         const timisoaraCoordinates = fromLonLat([21.2087, 45.7489]);
 
         const vectorSource = new VectorSource();
+        vectorSourceRef.current = vectorSource;
         const vectorLayer = new VectorLayer({
             source: vectorSource,
         });
@@ -68,11 +73,11 @@ const HomePage: React.FC = () => {
         searchNominatim.on('select', (e) => {
             const coordinate = e.coordinate;
 
-            const pointFeature = new Feature({
+            const pointFeatureRed = new Feature({
                 geometry: new Point(coordinate)
             });
 
-            pointFeature.setStyle(new Style({
+            pointFeatureRed.setStyle(new Style({
                 image: new CircleStyle({
                     radius: 7,
                     fill: new Fill({
@@ -85,14 +90,68 @@ const HomePage: React.FC = () => {
                 })
             }));
 
-            vectorSource.clear(); // Curăță marker-ele existente dacă dorești
-            vectorSource.addFeature(pointFeature);
+            vectorSource.addFeature(pointFeatureRed);
 
             const view = map.getView();
             view.setCenter(coordinate);
-            view.setZoom(16);
+            view.setZoom(15);
+
+            if (lastTwoLocations[0].length !== 0 && lastTwoLocations[1].length !== 0) {
+                lastTwoLocations.forEach(coord => {
+                    const pointFeatureGreen = new Feature({
+                        geometry: new Point(coord)
+                    });
+
+                    pointFeatureGreen.setStyle(new Style({
+                        image: new CircleStyle({
+                            radius: 7,
+                            fill: new Fill({
+                                color: 'green'
+                            }),
+                            stroke: new Stroke({
+                                color: 'white',
+                                width: 2
+                            })
+                        })
+                    }));
+
+                    vectorSource.addFeature(pointFeatureGreen);
+                });
+            }
+
+            setLastTwoLocations(prev => {
+                console.log(prev);
+                console.trace();
+                if (prev[0].length !== 0 && prev[1].length !== 0) {
+                    return [coordinate, []];
+                } else if (prev[0].length === 0) {
+                    return [coordinate, []];
+                } else {
+                    return [prev[0], coordinate];
+                }
+            });
+
         });
-    }, []);
+    });
+
+    // useEffect(() => {
+    //     if (lastTwoLocations[0].length && lastTwoLocations[1].length && !vectorSourceRef.current) {
+    //         const vectorSource = new VectorSource();
+    //
+    //         // Crează și stilizează punctele pentru ultimele două locații
+    //
+    //
+    //
+    //         // Adaugă vector layer pe hartă
+    //         const vectorLayer = new VectorLayer({
+    //             source: vectorSource,
+    //         });
+    //
+    //         if (mapRef.current) {
+    //             mapRef.current.addLayer(vectorLayer);
+    //         }
+    //     }
+    // }, [lastTwoLocations]);
 
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
