@@ -1,17 +1,12 @@
-const mongoose = require('mongoose');
-require('dotenv').config(); // Importă variabilele de mediu din .env
+const mongoose = require("mongoose");
 
-// Funcție pentru conectarea la baza de date
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        console.log('MongoDB connected');
+        await mongoose.connect(process.env.MONGODB_URI);
+        console.log("MongoDB connected");
     } catch (error) {
-        console.error('MongoDB connection error:', error);
-        process.exit(1); // Iese din aplicație dacă nu reușește conexiunea
+        console.error("Database connection error:", error);
+        process.exit(1);
     }
 };
 

@@ -1,30 +1,29 @@
-// auth-backend/app.js
-
-// Importuri necesare
+// app.js
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
 const dotenv = require("dotenv");
-const authRoutes = require("./routes/auth");
+const authRoutes = require("./routes/auth"); // Importăm rutele de autentificare
 
-// Încarcă variabilele de mediu din fișierul .env
-dotenv.config();
-
-// Inițializează aplicația Express
+dotenv.config(); // Încarcă variabilele din fișierul .env
+const cors = require('cors')
 const app = express();
+app.use(cors())
+// Middleware pentru parsarea datelor JSON
+app.use(express.json());
 
-// Middleware-uri
-app.use(cors()); // Permite cererile cross-origin
-app.use(express.json()); // Parsează cererile de tip JSON
-
-// Conectare la baza de date MongoDB (fără opțiunile deprecate)
-mongoose.connect(process.env.MONGODB_URI)
+// Conectarea la MongoDB folosind variabila de mediu pentru URI-ul bazei de date
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
     .then(() => console.log("MongoDB connected"))
     .catch((error) => console.error("MongoDB connection error:", error));
 
-// Definirea rutelor de autentificare
+// Setăm ruta de autentificare
 app.use("/api/auth", authRoutes);
 
-// Pornirea serverului pe un port diferit dacă PORT este deja utilizat
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Pornim serverul pe portul definit în .env sau pe portul 5000 implicit
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

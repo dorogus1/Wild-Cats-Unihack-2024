@@ -1,15 +1,16 @@
+// LoginPage.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css"; // Asigură-te că ai importat fișierul CSS
+import "./LoginPage.css";
 
 interface LoginPageProps {
     setIsLoggedIn: (value: boolean) => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [errorMessage, setErrorMessage] = useState<string>("");
     const navigate = useNavigate();
 
     const handleLogin = async () => {
@@ -23,24 +24,25 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
             if (response.ok) {
                 const data = await response.json();
                 localStorage.setItem("token", data.token);
+                localStorage.setItem("isLoggedIn", "true");
                 setIsLoggedIn(true);
                 navigate("/home");
             } else {
-                const data = await response.json();
-                setErrorMessage(data.message);
+                setErrorMessage("Invalid username or password");
             }
         } catch (error) {
             setErrorMessage("An error occurred. Please try again.");
+            console.error("Error during login:", error);
         }
     };
 
-    const handleSignUpRedirect = () => {
-        navigate("/signup"); // Redirecționează către pagina de înregistrare
+    const handleSignUp = () => {
+        navigate("/signup");
     };
 
     return (
         <div className="login-container">
-            <h1 className={"login-title"}>Login</h1>
+            <h1 className="login-title">Login</h1>
             <input
                 type="text"
                 placeholder="Username"
@@ -57,7 +59,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
             />
             {errorMessage && <p className="error-message">{errorMessage}</p>}
             <button className="button" onClick={handleLogin}>Login</button>
-            <button className="button" onClick={handleSignUpRedirect}>Sign Up</button> {/* Noul buton pentru redirecționare */}
+            <button className="button" onClick={handleSignUp}>Sign Up</button>
         </div>
     );
 };

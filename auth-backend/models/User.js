@@ -1,4 +1,3 @@
-// auth-backend/models/User.js
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
@@ -6,5 +5,6 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
 });
 
-module.exports = mongoose.model("User", userSchema);
-// auth-backend/routes/auth.js
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
