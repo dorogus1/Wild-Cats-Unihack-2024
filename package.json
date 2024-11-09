@@ -37,6 +37,8 @@
     "jest-watch-typeahead": "^1.0.0",
     "mini-css-extract-plugin": "^2.4.5",
     "ol": "^10.2.1",
+    "ol-ext": "^4.0.24",
+    "openlayers-ext": "^3.1.5",
     "postcss": "^8.4.4",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^6.2.1",
@@ -142,5 +144,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "@types/ol-ext": "npm:@siedlerchr/types-ol-ext@^3.5.1"
   }
 }
