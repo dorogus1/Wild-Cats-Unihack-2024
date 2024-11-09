@@ -1,3 +1,7 @@
+.login-title {
+    text-align: center;
+}
+
 .signup-container {
     max-width: 400px;
     margin: auto;
@@ -9,7 +13,7 @@
 }
 
 .input-field {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     margin: 10px 0;
     border-radius: 5px;

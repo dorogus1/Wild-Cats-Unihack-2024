@@ -40,7 +40,7 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ setIsSignedUp }) => {
 
     return (
         <div className="signup-container">
-            <h1>Sign Up</h1>
+            <h1 className={"signup-title"}>Sign Up</h1>
             <input
                 type="text"
                 className="input-field"
