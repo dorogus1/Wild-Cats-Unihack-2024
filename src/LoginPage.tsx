@@ -1,32 +1,41 @@
-// LoginPage.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css";
+import "./LoginPage.css"; // Asigură-te că ai importat fișierul CSS
 
 interface LoginPageProps {
-    setIsLoggedIn: (value: true) => void;
+    setIsLoggedIn: (value: boolean) => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
-    const [username, setUsername] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
-    const handleLogin = () => {
-        const users = JSON.parse(localStorage.getItem("users") || "[]");
-        const user = users.find((user: any) => user.username === username && user.password === password);
+    const handleLogin = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+            });
 
-        if (user) {
-            localStorage.setItem("isLoggedIn", "true");
-            setIsLoggedIn(true);
-            navigate("/home");
-        } else {
-            alert("Invalid username or password");
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem("token", data.token);
+                setIsLoggedIn(true);
+                navigate("/home");
+            } else {
+                const data = await response.json();
+                setErrorMessage(data.message);
+            }
+        } catch (error) {
+            setErrorMessage("An error occurred. Please try again.");
         }
     };
 
-    const handleSignUp = () => {
-        navigate("/signup");
+    const handleSignUpRedirect = () => {
+        navigate("/signup"); // Redirecționează către pagina de înregistrare
     };
 
     return (
@@ -46,8 +55,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
             <button className="button" onClick={handleLogin}>Login</button>
-            <button className="button" onClick={handleSignUp}>Sign Up</button>
+            <button className="button" onClick={handleSignUpRedirect}>Sign Up</button> {/* Noul buton pentru redirecționare */}
         </div>
     );
 };
