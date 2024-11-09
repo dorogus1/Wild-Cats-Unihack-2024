@@ -40,7 +40,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
 
     return (
         <div className="login-container">
-            <h1>Login</h1>
+            <h1 className={"login-title"}>Login</h1>
             <input
                 type="text"
                 placeholder="Username"
