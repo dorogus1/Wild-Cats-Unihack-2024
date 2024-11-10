@@ -15,13 +15,13 @@ import Point from 'ol/geom/Point';
 import { Style, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
 import VectorLayer from "ol/layer/Vector";
+import LineString from 'ol/geom/LineString';
 
 const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const mapRef = useRef<Map | null>(null);
     const vectorSourceRef = useRef<VectorSource | null>(null);
-
-    const [lastTwoLocations, setLastTwoLocations] = useState<[number[], number[]]>([[], []]);
+    const bikeLayerRef = useRef<VectorLayer | null>(null);
     const [map, setMap] = useState<Map | null>(null);
 
     const handleLogout = () => {
@@ -58,6 +58,7 @@ const HomePage: React.FC = () => {
                 }),
             }),
         });
+        bikeLayerRef.current = bikeLayer;
 
         const olMap = new Map({
             target: 'map',
@@ -87,16 +88,6 @@ const HomePage: React.FC = () => {
         searchNominatim.on('select', (e) => {
             const coordinate = e.coordinate;
 
-            setLastTwoLocations(lastTwoLocations => {
-                if (lastTwoLocations[0].length !== 0 && lastTwoLocations[1].length !== 0) {
-                    return [coordinate, []];
-                } else if (lastTwoLocations[0].length === 0) {
-                    return [coordinate, []];
-                } else {
-                    return [lastTwoLocations[0], coordinate];
-                }
-            });
-
             const pointFeature = new Feature({
                 geometry: new Point(coordinate),
             });
@@ -110,7 +101,7 @@ const HomePage: React.FC = () => {
             }));
 
             vectorSource.addFeature(pointFeature);
-            console.log(vectorSource.getFeatures());
+
             if (vectorSource.getFeatures().length === 2) {
                 vectorSource.getFeatures().forEach(feature => {
                     feature.setStyle(new Style({
@@ -120,12 +111,71 @@ const HomePage: React.FC = () => {
                             stroke: new Stroke({ color: 'white', width: 2 }),
                         }),
                     }));
-            })}
+                })
 
-            if (vectorSource.getFeatures().length === 3) {
+                const lineCoordinates = vectorSource.getFeatures()
+                    .map(feature => (feature.getGeometry() as Point).getCoordinates());
+
+                const bikeLayerFeatures = bikeLayerSource.getFeatures();
+
+                const retrieveNearestFeature = (coordinate: number[]): Feature<LineString> | null => {
+                    let nearestFeature: Feature<LineString> | null = null;
+                    let minDistance = Infinity;
+
+                    bikeLayerFeatures.forEach((feature) => {
+                        const geometry = feature.getGeometry();
+
+                        if (geometry instanceof LineString) {
+                            geometry.forEachSegment((start, end) => {
+                                const distance = Math.min(
+                                    computeDistance(coordinate, start),
+                                    computeDistance(coordinate, end)
+                                );
+
+                                if (distance < minDistance) {
+                                    minDistance = distance;
+                                    nearestFeature = feature as Feature<LineString>;
+                                }
+                            });
+                        }
+                    });
+
+                    return nearestFeature;
+                };
+
+                const startPoint = lineCoordinates[0];
+                const endPoint = lineCoordinates[1];
+
+                const closestStartSegment = retrieveNearestFeature(startPoint);
+                const closestEndSegment = retrieveNearestFeature(endPoint);
+
+                if (closestStartSegment && closestEndSegment) {
+                    const combinedCoordinates = [
+                        startPoint,
+                        ...((closestStartSegment.getGeometry() as LineString).getCoordinates().slice(1, -1)),
+                        endPoint
+                    ];
+
+                    const lineFeature = new Feature(
+                        new LineString(combinedCoordinates)
+                    );
+
+                    lineFeature.setStyle(new Style({
+                        stroke: new Stroke({
+                            color: 'green',
+                            width: 10,
+                        })
+                    }));
+
+                    // Add the line feature to the bikeLayer source
+                    vectorSource.addFeature(lineFeature);
+                }
+            }
+
+            if (vectorSource.getFeatures().length === 4) {
                 const vectorFeatures = vectorSource.getFeatures();
                 vectorSource.clear();
-                vectorSource.addFeature(vectorFeatures[2]);
+                vectorSource.addFeature(vectorFeatures[3]);
             }
 
             const view = olMap.getView();
@@ -135,7 +185,13 @@ const HomePage: React.FC = () => {
         });
 
         setMap(olMap);
-    }, [lastTwoLocations]);
+    }, []);
+
+    const computeDistance = (coord1: number[], coord2: number[]): number => {
+        const dx = coord2[0] - coord1[0];
+        const dy = coord2[1] - coord1[1];
+        return Math.sqrt(dx * dx + dy * dy);
+    };
 
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
