@@ -87,11 +87,21 @@ const HomePage: React.FC = () => {
         searchNominatim.on('select', (e) => {
             const coordinate = e.coordinate;
 
-            const pointFeatureRed = new Feature({
+            setLastTwoLocations(lastTwoLocations => {
+                if (lastTwoLocations[0].length !== 0 && lastTwoLocations[1].length !== 0) {
+                    return [coordinate, []];
+                } else if (lastTwoLocations[0].length === 0) {
+                    return [coordinate, []];
+                } else {
+                    return [lastTwoLocations[0], coordinate];
+                }
+            });
+
+            const pointFeature = new Feature({
                 geometry: new Point(coordinate),
             });
 
-            pointFeatureRed.setStyle(new Style({
+            pointFeature.setStyle(new Style({
                 image: new CircleStyle({
                     radius: 7,
                     fill: new Fill({ color: 'red' }),
@@ -99,44 +109,33 @@ const HomePage: React.FC = () => {
                 }),
             }));
 
-            vectorSource.clear();
-            vectorSource.addFeature(pointFeatureRed);
-
-            const view = olMap.getView();
-            view.setCenter(coordinate);
-            view.setZoom(15);
-
-            if (lastTwoLocations[0].length !== 0 && lastTwoLocations[1].length !== 0) {
-                lastTwoLocations.forEach(coord => {
-                    const pointFeatureGreen = new Feature({
-                        geometry: new Point(coord),
-                    });
-
-                    pointFeatureGreen.setStyle(new Style({
+            vectorSource.addFeature(pointFeature);
+            console.log(vectorSource.getFeatures());
+            if (vectorSource.getFeatures().length === 2) {
+                vectorSource.getFeatures().forEach(feature => {
+                    feature.setStyle(new Style({
                         image: new CircleStyle({
                             radius: 7,
                             fill: new Fill({ color: 'green' }),
                             stroke: new Stroke({ color: 'white', width: 2 }),
                         }),
                     }));
+            })}
 
-                    vectorSource.addFeature(pointFeatureGreen);
-                });
+            if (vectorSource.getFeatures().length === 3) {
+                const vectorFeatures = vectorSource.getFeatures();
+                vectorSource.clear();
+                vectorSource.addFeature(vectorFeatures[2]);
             }
 
-            setLastTwoLocations(prev => {
-                if (prev[0].length !== 0 && prev[1].length !== 0) {
-                    return [coordinate, []];
-                } else if (prev[0].length === 0) {
-                    return [coordinate, []];
-                } else {
-                    return [prev[0], coordinate];
-                }
-            });
+            const view = olMap.getView();
+            view.setCenter(coordinate);
+            view.setZoom(15);
+
         });
 
         setMap(olMap);
-    }, []);
+    }, [lastTwoLocations]);
 
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
